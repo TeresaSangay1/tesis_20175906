@@ -79,12 +79,7 @@ gen vacante=1 if ESTADO_PLAZA=="VACANTE"
 bysort COD_MOD: egen plazas_total = count(COD_MOD) // numero total de plazas por código modular
 bysort COD_MOD: egen plazas_vacantes = total(vacante) // numero total de plazas vacantes por código modular
 
-gen contratado=1 if SITLAB_DOCENTE=="CONTRATADO"
-gen nombrado=1 if SITLAB_DOCENTE=="NOMBRADO"
-bysort COD_MOD: egen total_contratados = total(contratado)
-bysort COD_MOD: egen total_nombrados = total(nombrado)
-
-drop TIPOPLAZA CODPLAZA ESTADO_DOCENTE SITLAB_DOCENTE ESTADO_PLAZA JORNLAB vacante contratado nombrado  TIPODEIE BILINGÜE TIPODERURALIDAD FRONTERA VRAEM
+drop TIPOPLAZA CODPLAZA ESTADO_DOCENTE SITLAB_DOCENTE ESTADO_PLAZA JORNLAB vacante TIPODEIE BILINGÜE TIPODERURALIDAD FRONTERA VRAEM
 
 sort COD_MOD
 duplicates drop

@@ -52,13 +52,11 @@ replace bono_rural = 0 if ruralidad ==0
 replace bono_rural = 0 if ruralidad ==.
 
 gen bono_total=bono_bilingue +bono_front+bono_rural+bono_tipoie+bono_vraem
-drop bono_bilingue bono_front bono_tipoie bono_vraem bono_rural
+drop bono_bilingue bono_front bono_tipoie bono_vraem bono_rural NROCED infe_std
 
-*drop total_equipo topografia capital_ugel clima
-*drop  infe_std distancia_min vraem DIS_FRONT
 
 replace ruralidad=0 if AREA_CENSO==1 & ruralidad==.
-rename (ALTITUD NLAT NLONG AREA_CENSO DIS_FRONT) (altitud latitud longitud area frontera) 
+rename (DESCN ALTITUD NLAT NLONG AREA_CENSO DIS_FRONT) (nivel altitud latitud longitud area frontera) 
 
 $data
 save "data_final", replace
