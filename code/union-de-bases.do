@@ -33,6 +33,7 @@ gen macroregion = 1 if inlist(dpto,2,6,13,14,20,24)
 	label val macroregion macroreg
 
 codebook GESTION
+gen convenio_priv = GESTION==2
 drop GESTION CODGEO CODOOII
 
 ** indice de rotacion parcial (asumiendo nuevas contratciones = 0 por limitacion de la data)
@@ -63,7 +64,7 @@ replace bono_rural = 0 if ruralidad ==0
 replace bono_rural = 0 if ruralidad ==.
 
 gen bono_total=bono_bilingue +bono_front+bono_rural+bono_tipoie+bono_vraem
-drop bono_bilingue bono_front bono_tipoie bono_vraem bono_rural NROCED infe_std
+drop bono_bilingue bono_front bono_tipoie bono_vraem bono_rural NROCED
 
 replace ruralidad=0 if AREA_CENSO==1 & ruralidad==.
 rename (DESCN ALTITUD NLAT NLONG AREA_CENSO DIS_FRONT) (nivel altitud latitud longitud area_g frontera) 
@@ -79,6 +80,20 @@ drop distancia  // variable del censo contiene missing y errores
 geodist latitud longitud Y X, gen(distancia) // en km
 summ dist
 
+label def frontera 1 "IE de Frontera" 0 "No Frontera" 
+label val frontera frontera
+label def ruralidad 1 "Rural 1" 2 "Rural 2" 3 "Rural 3"
+label val ruralidad ruralidad
+label var irp "Indice de rotación parcial"
+label var area_g "Área geográfica"
+label var region_nat "Región Natural"
+label var ruralidad "Ruralidad" 
+
+replace material="1" if material=="SI"
+replace material="0" if material=="NO"
+destring material, replace 
+ 
+drop X Y REGION CODLOCAL longitud latitud cod_prov Rasgo
 
 $data
 save "data_final", replace

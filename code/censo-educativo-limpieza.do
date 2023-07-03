@@ -394,11 +394,11 @@ gen infe_estado=((0.3*piso_e)+(0.3*techo_e)+(0.4*pared_e))/3
 gen infe_material=(piso_mat+techo_mat+pared_mat)/3
 drop pared_estado techo_estado piso_estado pared_mat techo_mat piso_mat
 
-*gen infra_indice= (infe_estado+infe_material)/2
+gen infra_indice= (infe_estado+infe_material)/2
  
-egen min_infra = min(infe_estado)
-egen max_infra = max(infe_estado)
-gen infraestructura_indice = (infe_estado - min_infra) / (max_infra - min_infr)
+egen min_infra = min(infra)
+egen max_infra = max(infra)
+gen infraestructura = (infra_indice - min_infra) / (max_infra - min_infra)
 drop min max infe*
 summ 
 duplicates drop
@@ -412,8 +412,8 @@ save "Local_sec500_limpia", replace
 $censo
 use "horario.dta", clear
 keep if inlist(NROCED, "1AP", "3AP", "3AS")
-keep if ANEXO=0
-gen horario_escolar = clock(HT_HORAS, HT_MINUTOS) - clock(HI_HORAS, HI_INICIAO)
+keep if ANEXO=="0"
+gen horario_escolar = clock(HT_HORAS, HT_MINUTOS) - clock(HI_HORAS, HI_INICIO)
 keep COD_MOD horario_escolar
 $data 
 save "horario_limpia.dta", replace
@@ -647,7 +647,7 @@ isid CODLOCAL COD_MOD
 gen servicios_ie=agua_ie+desague_ie+electricidad_ie+internet
 drop agua_ie desague_ie electricidad_ie internet
 
-drop programa material_edu
+*drop programa material_edu
 *drop salud_docente topografia clima capital_ugel trayectos_cap
 $data
 save "censo_edu", replace

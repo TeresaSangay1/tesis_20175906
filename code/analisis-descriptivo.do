@@ -1,10 +1,9 @@
 
 *ssc install asdoc
 
-
 global data cd "C:\Users\teresa\Documents\GIT\TESIS\data"
-global resources cd "C:\Users\teresa\Documents\GIT\TESIS" 
-
+global resources cd "C:\Users\teresa\Documents\GIT\TESIS\resources" 
+global fig cd "C:\Users\teresa\Documents\GIT\TESIS\fig"
 $data
 use "data_final", clear
 
@@ -16,14 +15,32 @@ table macror, c(mean `x')
 table area_g, c(mean `x')
 }
 
-* agrupaciones : área geográfica, macroregion y ruralidad
+mean irp
 
-global vars "nivel est_ge_originario total_equipo contratados_n nombrados_n mujer_n jornada_40_n jornada_30_n edad_30_n edad_31_60_n edad_60_n experiencia_15_n experiencia_16_25 experiencia_26_40 experiencia_41_n clima capital_ugel trayectos_cap peligro_nat peligro_antropicos area_m2 vulnerabilidad servicios_basicos_cp servicios_cp infe_minmax servicios_ie rural vraem frontera altitud tipoie ruralidad macroregion eib comunidad_leng_orig est_lengua_orig topografia distancia AB C D E" 
-logit irp25 $vars 
-logit irp10 $vars 
-logit vac_d $vars
+tabstat irp, stat(mean cv) by(dpto)
+ttest irp, by(area_g)
 
-regress irp $vars
+* IRP PROMEDIO POR GRUPOS
+*Grafico 1
+grmeanby macror area_g region ruralidad frontera vraem, summarize(irp) ytitle("Media") title("Promedio de IRP por grupos") name(gd1, replace)
+$fig
+graph export "gd1.png", width(500) replace
+*grafico 2
+grmeanby est_ge_originario nivel servicios_basicos_cp servicios_ie, summarize(irp) ytitle("Media") title("Promedio de IRP por grupos") name(gd2, replace)
+$fig
+graph export "gd2.png", width(500) replace
+
+* IRP promedio por dpto
+local mean_irp=r(mean irp) 
+display `mean_irp'
+
+graph hbar (mean) irp, over(dpto)  blabel(total, size(small) format(%2.1f)) ytitle("promedio") title("Promedio de IRP por departamento")  yline(`mean_irp') name(gd3, replace)
+$fig
+graph export "gd3.png", width(500) replace
+
+
+
+
 * codebook $vars
 * Variables con missing : est_ge_originario clima totpografia capital trayectos_cap peligro_nat peligro_antropicos area_m2 vulnerabilidad servicios* infe_minmax distancia_min eib comunidad_leng_orig est_lengua_orig total_docentes
 
