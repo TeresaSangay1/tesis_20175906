@@ -2,7 +2,7 @@
 *******************************************
 
 * ---------------------------- DATA "LINEAL" ------------------------------
-* ------------------------------------------------------------------------------
+* --------------------------------------------------------------------------
 cls
 global data cd "C:\Users\teresa\Documents\GIT\TESIS\data"
 global censo cd "C:\Users\teresa\Documents\GIT\TESIS\data\CENSO EDUCATIVO 2022"
@@ -18,30 +18,42 @@ merge 1:1 COD_MOD using "Lineal_1A_03", nogen
 * P119_SI_2 P119_SI_3  salud docente
 * p163 director dio soporte y apoyo a docentes
 * hay alumnos de ge P175_1 P175_2 P175_3 P175_4 P175_5 P175_6 P175_7 P175_8 P175_9 (otro)
-* P176 y P176_SI hay mayor ge, cual // muchos missing
+* P176 y P176_SI hay mayor ge, cual
 * P177 EIB
 * P180 conoce comunidad habla lengua originaria, (P180_si que lengua -> no se usa), 
 * estudiantes hablan lengua originaria P181_SI_1 proporcion (P181_SI_LO cual, no se usa)
 * p300_doc total docentes
 * p401 materiales
-* p721 experiencia como P721_Q años
+* p721 experiencia como director
+* P721_Q años
 
 *codebook ANEXO 
-drop if ANEXO!="0" // mantener i.e.
+drop if ANEXO!="0" 
 
 gen est_ge_originario=0 if P175_1=="NO" & P175_2=="NO" & P175_3=="NO" & P175_4=="NO"
 replace est_ge_originario=1 if est_ge_originario==. & P175_1=="SI" | P175_2=="SI" | P175_3=="SI" & P175_4=="SI"
 replace est_ge_originario=2 if inlist(P176_SI,"1","2","3","4")
 
+gen salud_docente = P119_SI_2=="X"
+replace salud = salud + 1 if P119_SI_3 =="X"
+gen apoyo_docente = P163 == "SI"
+
+gen nuevos_docentes=P170_3_Q
+gen acompañamiento = P171 =="SI" 
+
+gen castellano_segunda_lengua = P178=="SI"
+gen enseñanza_bilingue =P179== "SI"
+gen fortalecimiento_gestion =P701=="SI" 
+
 rename (P177 P181 P181_SI_Q P180) (eib estlo est_lengua_orig comunidad_leng_orig)
 rename (P300_DOC P401 P721 P721_Q) (total_docentes material_edu experiencia_dir experiencia_dir_años)
 
-  keep COD_MOD CODLOCAL NROCED est_ge_originario eib comunidad_leng_orig est_lengua_orig total_docentes experiencia_dir experiencia_dir_años estlo
+ keep COD_MOD CODLOCAL NROCED est_ge_originario eib comunidad_leng_orig est_lengua_orig total_docentes experiencia_dir experiencia_dir_años estlo material_edu salud apoyo nuevos_docentes acompañamiento castellano_segunda_lengua enseñanza_bilingue fortalecimiento_gestion
 
 save "Lineal_1A", replace 
 
 * PRIMARIA
------------
+*-----------
 
 use "Lineal_3AP_01", clear
 merge 1:1 COD_MOD using "Lineal_3AP_02", nogen
@@ -54,15 +66,26 @@ gen est_ge_originario = 0 if P178_1=="NO" & P178_2=="NO" & P178_3=="NO" & P178_4
 replace est_ge_originario=1 if est_ge_originario==. & P178_1=="SI" | P178_2=="SI" | P178_3=="SI" & P178_4=="SI"
 replace est_ge_originario=2 if inlist(P179_SI,"1","2","3","4")
 
+gen salud_docente = P118_2=="X" // coordinaciones con el centro de salud para brindar salud fisica a los docentes
+replace salud = salud + 1 if P118_4 =="X" //salud mental
+gen apoyo_docente = P161 == "SI" // soporte y apoyo en torno a desempeño en el marco de acompñamiento pedagogico
+gen nuevos_docentes=P173_3_Q
+gen acompañamiento = P174 =="SI" // El personal de este servicio/nivel educativo, ha recibido algún tipo de soporte o acompañamiento socioemocional de parte de equipos de UGEL o DRE
+
+gen castellano_segunda_lengua = P181=="SI"
+gen enseñanza_bilingue =P182== "SI"
+gen fortalecimiento_gestion =P701=="SI" //. Este servicio/nivel educativo ¿coordina alguna acción con el gobierno local (distrital o provincial) para mejorar la prestación del servicio educativo?
+
 rename (P180 P183 P184 P184_SI) (eib comunidad_leng_orig estlo est_lengua_orig)
 rename (P300_DOC P401 P721 P721_Q) (total_docentes material_edu experiencia_dir experiencia_dir_años)
 
-keep COD_MOD CODLOCAL NROCED est_ge_originario eib comunidad_leng_orig est_lengua_orig total_docentes experiencia_dir experiencia_dir_años estlo
+keep COD_MOD CODLOCAL NROCED est_ge_originario eib comunidad_leng_orig est_lengua_orig total_docentes experiencia_dir experiencia_dir_años estlo material_edu salud apoyo nuevos_docentes acompañamiento castellano_segunda_lengua enseñanza_bilingue fortalecimiento_gestion
+
 
 save "Lineal_3AP", replace 
 
 * SECUNDARIA
-
+* ----------
 use "Lineal_3AS_01", clear
 merge 1:1 COD_MOD using "Lineal_3AS_02", nogen
 merge 1:1 COD_MOD using "Lineal_3AS_03", nogen
@@ -74,10 +97,17 @@ gen est_ge_originario = 0 if P191_1=="NO" & P191_2=="NO" & P191_3=="NO" & P191_4
 replace est_ge_originario=1 if est_ge_originario==. & P191_1=="SI" | P191_2=="SI" | P191_3=="SI" & P191_4=="SI"
 replace est_ge_originario=2 if inlist(P192_SI,"1","2","3","4")
 
+gen nuevos_docentes=P174_3_Q
+gen acompañamiento = P175 =="SI" 
+
+gen castellano_segunda_lengua = P193B=="SI"
+gen enseñanza_bilingue =P193D== "SI"
+gen fortalecimiento_gestion =P701=="SI" 
+
 rename (P193A P193D P193E P193E_SI) (eib comunidad_leng_orig estlo est_lengua_orig)
 rename (P300_TDOC P401 P721 P721_Q) (total_docentes material_edu experiencia_dir experiencia_dir_años)
 
-keep COD_MOD CODLOCAL NROCED est_ge_originario eib comunidad_leng_orig est_lengua_orig total_docentes experiencia_dir experiencia_dir_años estlo
+keep COD_MOD CODLOCAL NROCED est_ge_originario eib comunidad_leng_orig est_lengua_orig total_docentes experiencia_dir experiencia_dir_años estlo castellano_segunda_lengua enseñanza_bilingue fortalecimiento_gestion nuevos_docentes acompañamiento
 
 save "Lineal_3AS", replace 
 
@@ -242,7 +272,7 @@ tab P121_7
 rename (CLIMA P105_EN P105_DE P108 P109 P117_2 P117_3 P121_1 P121_2 P121_6 P201_1 P201_2 P201_3 P201_4 P201_5 P203 P210 P222 P118_1 P118_2 P118_3 P118_4 P118_5 P118_6 P118_7) (clima area_en area_de topografia suelo capital_ugel trayectos_cap zona_industrial zona_minera zona_agro electricidad_cp agua_cp desague_cp internet_cp salud_cp agua_local electricidad_local internet_local mar rio volcan huayco acequia erosion_suelo deslizamiento)
 
 *zona_industrial -> Zona industrial emanación de gases y desperdicios tóxicos 
-codebook zona_industrial zona_minera zona_agro
+*codebook zona_industrial zona_minera zona_agro
 gen peligro_antropicos=zona_industrial+zona_minera+P121_3+P121_4+P121_5+ zona_agro+P121_7 //7 peligros: comercio ambulatorio intenso microcomercializacion de droga, inseguridad ciudadadana y/o subversion, 
 
 egen area_m2= concat(area_en area_de) if area_de!=0 & area_de!=., punct(.)
@@ -265,8 +295,8 @@ drop GESTION
 
 replace clima=2 if clima ==1 // desértico y desertico costero
 codebook clima
-recode clima (2=1) (3 4 5 6= 2) (7 8 9 = 3)
-label def tipoclima 1 desertico 2 frío 3 tropical, modify
+recode clima (2=1) (3 4 5 6= 3) (7 8 9 = 2)
+label def tipoclima 1 desertico 3 frío 2 tropical, modify
 label val clima tipoclima
 
 	codebook agua_cp electricidad_cp desague_cp
@@ -275,7 +305,7 @@ label val clima tipoclima
 	gen servicios_cp=salud_cp+P201_7+P201_8+P201_9+P201_10+P201_11+P201_12
 
 isid CODLOCAL
-keep CODLOCAL GESTION clima topografia capital_ugel trayectos_cap servicios_basicos_cp servicios_cp peligro_nat peligro_antropicos vulnerabilidad area_m2
+keep CODLOCAL GESTION clima topografia capital_ugel trayectos_cap servicios_basicos_cp servicios_cp peligro_nat peligro_antropicos vulnerabilidad area_m2 
 
 save "Local_lineal_limpia", replace
 
@@ -290,42 +320,42 @@ keep if inlist(P501_3_1, "A1", "A2", "A3", "B0", "F0")
 keep CODLOCAL NUMERO P501_8_2 P501_8_3 P501_11_1 P501_11_2 P501_12_1 P501_12_2 P501_13_1 P501_13_2 
 rename (P501_8_2 P501_8_3 P501_11_1 P501_11_2 P501_12_1 P501_12_2 P501_13_1 P501_13_2) (puertas_estado puertas pared pared_estado techo techo_estado piso piso_estado)
 duplicates drop
+
 tab pared
-gen pared_mat = 2 if inlist(pared,1,4)
+gen pared_mat = 3 if inlist(pared,1,4)
+replace pared_mat = 2 if inlist(pared, 2,3,5,6,7,8,9)
 replace pared_mat = 1 if inlist(pared, 2,3,5,6,7,8,9)
-replace pared_mat = 0 if inlist(pared, 2,3,5,6,7,8,9)
 label var pared_mat "Pared - material predominante"
-label def material 2 "material noble" 1 "material rústico" 0 "material precario"
+label def material 3 "material noble" 2 "material rústico" 1 "material precario"
 /* noble : ladrillo o concreto 
 rústico: quincha, adobe o tapial, o piedra con barro, cal y/o cemento, madera
 precario: eternit o fibra de concreto, estera, triplay, cartón o plástico, otros */
 label val pared_mat material
 drop pared
 tab techo
-gen techo_mat = 2 if inlist(techo,1)
-replace techo_mat = 1 if inlist(techo, 2,3,4,5,6,7,9)
-replace techo_mat = 0 if inlist(techo,8,10)
+gen techo_mat = 3 if inlist(techo,1)
+replace techo_mat = 2 if inlist(techo, 2,3,4,5,6,7,9)
+replace techo_mat = 1 if inlist(techo,8,10)
 label var techo_mat "Techo - material predominante"
-label def techomat 0 "material precario" 1 "material no noble" 2 "material noble"
+label def techomat 1 "material precario" 2 "material no noble" 3 "material noble"
 /* noble: concreto armado
 no noble: madera, teja, calamina, fibra de cemento, o similares (eternit, lata o laton)
 precario: caña con barro, otro*/
 label val techo_mat techomat
 drop techo
 tab piso
-gen piso_mat = 0 if inlist(piso,6,7)
-replace piso_mat = 1 if inlist(piso,5)
-replace piso_mat = 2 if inlist(piso,4)
-replace piso_mat = 3 if inlist(piso,1,2,3)
+gen piso_mat = 1 if inlist(piso,6,7)
+replace piso_mat = 2 if inlist(piso,5)
+replace piso_mat = 3 if inlist(piso,1,2,3,4)
 label var piso_mat "Piso - material predominante"
-label def pisomat 0 "piso de tierra u otro" 1 "piso entablado" 2 "piso de cemento / Material adecuado" 
+label def pisomat 1 "piso de tierra u otro" 2 "piso entablado" 3 "piso de cemento / Material adecuado" 
 /* material adecuado: parquet o madera pulida, vinilico, pisopk, loseta, ceramico o similar
 piso entablado: madera entablada
 piso de cemento: cemento
 piso de tierra u otro : tierra, otro
 */
 label val piso_mat pisomat
-drop piso
+drop piso 
 
 drop puertas*
 /*tab puertas
@@ -345,8 +375,8 @@ tab pared_estado
 tab techo_estado
 tab piso_estado
 
-recode piso_e techo_e pared_e (1=3)(2=2)(3=1)(4=0)(5=.)
-label def estado 0 "No tiene y lo requiere" 1 "Malo" 2 "Regular" 3 "bueno", modify
+recode piso_e techo_e pared_e (1 5=4)(2=3)(3=2)(4=1)
+label def estado 1 "No tiene y lo requiere" 2 "Malo" 3 "Regular" 4 "bueno", modify
 label val piso_e techo_e pared_e estado
 *order CODLOCAL NUMERO puertas* pared* piso* techo*
 
@@ -360,18 +390,16 @@ foreach var of local varlist2 {
 	drop NUMERO
 	duplicates drop
 
-gen infe_estado=(piso_e+techo_e+pared_e)/3
+gen infe_estado=((0.3*piso_e)+(0.3*techo_e)+(0.4*pared_e))/3
 gen infe_material=(piso_mat+techo_mat+pared_mat)/3
 drop pared_estado techo_estado piso_estado pared_mat techo_mat piso_mat
 
-gen infra_indice= (infe_estado+infe_material)/2
-drop infe*
+*gen infra_indice= (infe_estado+infe_material)/2
  
-*egen infe_std = std(infra)
-egen min_infra = min(infra)
-egen max_infra = max(infra)
-gen infe_minmax = (infra - min_infra) / (max_infra - min_infr)
-drop infra min max
+egen min_infra = min(infe_estado)
+egen max_infra = max(infe_estado)
+gen infraestructura_indice = (infe_estado - min_infra) / (max_infra - min_infr)
+drop min max infe*
 summ 
 duplicates drop
 	
@@ -379,6 +407,16 @@ isid CODLOCAL
 
 count // 48,706
 save "Local_sec500_limpia", replace
+
+***************************************************************************
+$censo
+use "horario.dta", clear
+keep if inlist(NROCED, "1AP", "3AP", "3AS")
+keep if ANEXO=0
+gen horario_escolar = clock(HT_HORAS, HT_MINUTOS) - clock(HI_HORAS, HI_INICIAO)
+keep COD_MOD horario_escolar
+$data 
+save "horario_limpia.dta", replace
 
 ******************************************************************************
 * Limpieza data docentes
@@ -483,6 +521,7 @@ gen edad_56_60_n=docentes if CUADRO == "EDAD" & TIPDATO==9
 gen edad_61_65_n=docentes if CUADRO == "EDAD" & TIPDATO==10
 gen edad_66_70_n=docentes if CUADRO == "EDAD" & TIPDATO==11
 gen edad_71_n=docentes if CUADRO == "EDAD" & TIPDATO==12
+
 gen experiencia_5_n=docentes if CUADRO == "EXPERIENCIA LABORAL" & TIPDATO==1 //1 (00-05); 2(06-10); 3 (11-15); 4 (16-20); 5 (21-25); 6 (26-30); 7 (31-35); 8 (36-40); 9 (41 a más)
 gen experiencia_6_10_n=docentes if CUADRO == "EXPERIENCIA LABORAL" & TIPDATO==2
 gen experiencia_11_15_n=docentes if CUADRO == "EXPERIENCIA LABORAL" & TIPDATO==3
