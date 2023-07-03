@@ -88,12 +88,45 @@ label var irp "Indice de rotación parcial"
 label var area_g "Área geográfica"
 label var region_nat "Región Natural"
 label var ruralidad "Ruralidad" 
-
+label def eib 1 "EIB" 0 "NO EIB"
+label val eib eib
+label var comunidad_leng "Mayoría de la comunidad habla lengua nativa"
+ 
 replace material="1" if material=="SI"
 replace material="0" if material=="NO"
 destring material, replace 
  
-drop X Y REGION CODLOCAL longitud latitud cod_prov Rasgo
+replace mujer_n = (mujer_n/(mujer_n+hombre_n))*100 //proporcion de docentes mujeres
+ replace hombre_n =100-mujer_n
+ 
+replace contratados = (contratados_n/(contratados_n+nombrados_n))*100 //proporcion de docentes mujeres
+ replace nombrado=100-contratado
 
+gen jorn_40= (jornada_40/(jornada_40+jornada_30+jornada_25))*100
+gen jorn_30= (jornada_30/(jornada_40+jornada_30+jornada_25))*100 
+gen jorn_25= (jornada_25/(jornada_40+jornada_30+jornada_25))*100
+
+gen edad30=(edad_30/edad_30_n+edad_31_60_n+edad_60_n)*100
+gen edad31_60=(edad_31/edad_30_n+edad_31_60_n+edad_60_n)*100
+gen edad60=(edad_60/edad_30_n+edad_31_60_n+edad_60_n)*100
+
+gen experiencia15=(experiencia_15/(experiencia_15_n+experiencia_16_25+experiencia_26_40+experiencia_41_n))*100
+gen experiencia16_25=(experiencia_16/(experiencia_15_n+experiencia_16_25+experiencia_26_40+experiencia_41_n))*100
+gen experiencia26_40=(experiencia_26/(experiencia_15_n+experiencia_16_25+experiencia_26_40+experiencia_41_n))*100
+gen experiencia41=(experiencia_41/(experiencia_15_n+experiencia_16_25+experiencia_26_40+experiencia_41_n))*100
+
+foreach x in jorn_40 jorn_25 jorn_30 edad30 edad31_60 edad60 experiencia15 experiencia16_25 experiencia26_40 experiencia41 mujer_n hombre_n{
+replace `x'=0 if `x'==.
+}
+
+gen d_est_l_orig = inlist(est_lengua_orig, 1,2,3)
+label var d_est_l_orig "Estudiantes hablan lengua originaria"
+label def dlengest 1 "Sí" 0 "No"
+label val d_est_l_orig dlengest
+
+drop X Y REGION CODLOCAL longitud latitud cod_prov Rasgo jornada* edad_* experiencia_*
+
+recode nuevos_doc (.=0)
+replace apoyo_docente = acompañamiento + apoyo // docente recibe apoyo y/o acompañamiento
 $data
 save "data_final", replace

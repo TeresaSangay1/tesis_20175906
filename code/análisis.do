@@ -1,6 +1,8 @@
 
 global data cd "C:\Users\teresa\Documents\GIT\TESIS\data"
 global resources cd "C:\Users\teresa\Documents\GIT\TESIS\resources"
+$data
+use "data_final", clear
 *REGRESION
 
 * test de medias
@@ -15,11 +17,16 @@ pcorr irp25
 
 
 ** Regresión
-global vars "i.nivel i.est_ge_originario total_equipo contratados_n nombrados_n mujer_n jornada_40_n jornada_30_n edad_30_n edad_31_60_n edad_60_n experiencia_15_n experiencia_16_25 experiencia_26_40 experiencia_41_n clima capital_ugel trayectos_cap peligro_nat peligro_antropicos c.area_m2 vulnerabilidad servicios_basicos_cp servicios_cp c.infraes servicios_ie rural i.vraem frontera c.altitud i.tipoie ruralidad i.macroregion eib comunidad_leng_orig i.est_lengua_orig i.topografia c.distancia apoyo_docente salud_docente acompañamiento castellano_segunda_lengua enseñanza_bilingue fortalecimiento_gestion convenio AB C D E "
 
-logit irp25 $vars,  iterate(4) 
+global doc "contratados_n mujer_n jorn_40 jorn_30 edad30 edad31_60 edad60 experiencia16_25 experiencia26_40 experiencia41 apoyo_docente salud_docente  "
+global est "i.est_ge_originario d_est_l_orig"
+global esc "i.nivel total_equipo c.aream2_z c.infe_es i.tipoie eib servicios_ie fortalecimiento_gestion convenio castellano_segunda_lengua enseñanza_bilingue"
+global ent "clima capital_ugel trayectos_cap peligro_nat peligro_antropicos vulnerabilidad servicios_basicos_cp servicios_cp i.macroregion ruralidad rural i.vraem frontera c.altitud  comunidad_leng_orig i.topografia c.distancia AB C D E"
+logit irp25 $est $esc $ent $doc,  iterate(4) 
 $resources
 outreg2 using myfile, cttop(Logit)
+
+
 
 margins, dydx(*) atmean post
 outreg2 using myfile2, cttop(Logit)

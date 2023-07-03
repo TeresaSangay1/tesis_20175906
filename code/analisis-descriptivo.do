@@ -26,18 +26,23 @@ grmeanby macror area_g region ruralidad frontera vraem, summarize(irp) ytitle("M
 $fig
 graph export "gd1.png", width(500) replace
 *grafico 2
-grmeanby est_ge_originario nivel servicios_basicos_cp servicios_ie, summarize(irp) ytitle("Media") title("Promedio de IRP por grupos") name(gd2, replace)
+grmeanby nivel est_ge_originario servicios_basicos_cp servicios_ie, summarize(irp) ytitle("Media") name(gd2a, replace)
 $fig
-graph export "gd2.png", width(500) replace
+graph export "gd2a.png", width(500) replace
+
+grmeanby eib comunidad_leng_orig est_lengua_orig , summarize(irp) ytitle("Media") name(gd2b, replace) title("")
+$fig
+graph export "gd2b.png", width(500) replace
+
 
 * IRP promedio por dpto
 local mean_irp=r(mean irp) 
 display `mean_irp'
-
-graph hbar (mean) irp, over(dpto)  blabel(total, size(small) format(%2.1f)) ytitle("promedio") title("Promedio de IRP por departamento")  yline(`mean_irp') name(gd3, replace)
+graph hbar (mean) irp, over(dpto)  blabel(total, size(small) format(%2.1f)) ytitle("promedio")  yline(`mean_irp') name(gd3, replace)
 $fig
 graph export "gd3.png", width(500) replace
 
+global vars " apoyo_docente salud_docente acompañamiento castellano_segunda_lengua enseñanza_bilingue"
 
 
 
