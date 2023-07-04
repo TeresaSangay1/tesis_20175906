@@ -27,7 +27,7 @@ outreg2 using myfile, cttop(Logit)
 
 test contratados_n
 test contratados_n mujer_n
-test nivel
+test altitud
 margins, dydx(*) // atmean post
 outreg2 using myfile2, cttop(Logit)
 
