@@ -6,7 +6,7 @@ use "data_final", clear
 *REGRESION
 
 * test de medias
-ttest irp25, by(area_g)  
+ttest irp25, by(area)  
 
 *correlacion
 pcorr irp25 
@@ -17,18 +17,18 @@ pcorr irp25
 
 
 ** Regresión
-
-global doc "contratados_n mujer_n jorn_40 jorn_30 edad30 edad31_60 edad60 experiencia16_25 experiencia26_40 experiencia41 apoyo_docente salud_docente  "
+global doc "contratados_n mujer_n jorn_40 jorn_30 edad30 edad31_60 edad60 experiencia16_25 experiencia26_40 experiencia41 salud apoyo"
 global est "i.est_ge_originario d_est_l_orig"
-global esc "i.nivel total_equipo c.aream2_z c.infe_es i.tipoie eib servicios_ie fortalecimiento_gestion convenio castellano_segunda_lengua enseñanza_bilingue"
+global esc "i.nivel total_equipo c.aream2_z c.infe_es i.tipoie eib servicios_ie fortalecimiento_gestion convenio castellano_segunda_lengua enseñanza_bilingue ape tamclase material hrs bono_total"
 global ent "clima capital_ugel trayectos_cap peligro_nat peligro_antropicos vulnerabilidad servicios_basicos_cp servicios_cp i.macroregion ruralidad rural i.vraem frontera c.altitud  comunidad_leng_orig i.topografia c.distancia AB C D E"
-logit irp25 $est $esc $ent $doc,  iterate(4) 
+logit irp22 $est $esc $ent $doc,  iterate(4) 
 $resources
 outreg2 using myfile, cttop(Logit)
 
-
-
-margins, dydx(*) atmean post
+test contratados_n
+test contratados_n mujer_n
+test nivel
+margins, dydx(*) // atmean post
 outreg2 using myfile2, cttop(Logit)
 
 * Hosmer-Lemeshow goodness of fit test
@@ -39,7 +39,7 @@ estat classification, all
 estat classification, cut(0.68)
 
 *running the model and requesting odds ratios using the odds ratio option
-logit pass anxiety mastery interest, or
+logit irp24 $est $esc $ent $doc, or
 
 *to generate predicted probabilities (Y=1)
 

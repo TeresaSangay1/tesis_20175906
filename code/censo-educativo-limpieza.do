@@ -140,9 +140,8 @@ label def est_lengua 0 "ninguno" 1 "Pocos" 2 "La mayoria" 3 "Todos"
 label val est_lengua est_lengua
 
 replace experiencia_dir_años = 12 if experiencia_dir_años==1212 //corrigir registros
-drop if experiencia_dir_años > 90 // eliminar errores
+*drop if experiencia_dir_años > 90 // eliminar errores
 replace experiencia_dir_años =. if experiencia_dir_años > 90
-drop experiencia_dir
 drop if CODLOCAL==""
 
 duplicates drop
@@ -159,31 +158,21 @@ save "Lineal_total", replace  // Base linea para inicial (escolarizada), primari
 $censo
 use "Equipamiento", clear
 keep if NROCED == "1A" | NROCED == "3AP" | NROCED == "3AS"
-tab ANEXO
 drop if ANEXO =="1"
-
 destring(TIPDATO),replace
 rename TIPDATO EQUIPO
 drop if inlist(EQUIPO,5,12) // servidores (exclusivos del nivel) y modem
 label define eequipo 1 "TELEVISOR(ES)" 2 "COMPUTADORAS (PC DE ESCRITORIO)" 3 "LAPTOP CONVENCIONALES" 4 "LAPTOP XO" 6 "TABLETS" 7 "PROYECTOR" 8 "RADIOGRABADORA" 9 "REPRODUCTOR DE DVD O BLUE RAY" 10 "IMPRESORAS" 11 "PIZARRAS DIGITALES" 13 "SERVICIO DE INTERNET" 
 label values EQUIPO eequipo 
- 
-replace D02 = 1 if EQUIPO ==13 & CHK1=="SI" // sevicio de internet operativo
-
+ replace D02 = 1 if EQUIPO ==13 & CHK1=="SI" // sevicio de internet operativo
 drop CHK1 CHK2 DESCRIP ANEXO CUADRO D01 NIV_MOD GES_DEP NROCED CODGEO CODOOII AREA_CENSO
-
 duplicates report
 duplicates drop
-
 reshape wide D02, i(CODLOCAL COD_MOD) j(EQUIPO)
-
 rename (D021 D022 D023 D024 D026 D027 D028 D029 D0210 D0211 D0213) (tv pc laptop_conv laptop_xo tablets proyector radiograbadora dvd impresora pizarra_dig internet)
-
 gen total_equipo = laptop_xo+impresora + pizarra_dig + proyector + radiograbadora + dvd + tv + pc+laptop_conv+tablets
 drop impresora pizarra_dig proyector radiograbadora dvd tv laptop_xo pc laptop_conv tablets
-
 isid CODLOCAL COD_MOD
-
 save "Equipamiento_limpia", replace
 
 ***************************************************************************************
@@ -263,6 +252,9 @@ save "Local_Servicios_Basicos_limpia3",replace
 $censo
 use "Local_lineal", clear
 
+foreach x in P120_1 P120_2 P120_3 P120_4 P120_5 P120_6 P120_7 P120_8 P120_9 P120_10 P120_11 P120_12 P120_13 P120_14 P120_15 {
+replace `x'=0 if `x'==. 
+}
 gen peligro_nat=P120_1+P120_2+P120_3+P120_4+P120_5+P120_6+P120_7+P120_8+P120_9+P120_10+P120_11+P120_12+P120_13+P120_14+P120_15 // 15 peligros
 
 tab P121_3
@@ -280,6 +272,7 @@ destring area_m2, replace
 replace area_m2=area_en if area_m2==. 
 
 // vulnerabilidad
+
 gen vulnerabilidad = mar +rio + volcan + huayco + acequia + erosion_suelo + deslizamiento+P118_8 // indicadores de vulnerabilidad -> cercano a 
 	/*P118_1 -> Cercano al mar
 	  P118_2 -> Cercano a un rio
@@ -291,7 +284,6 @@ gen vulnerabilidad = mar +rio + volcan + huayco + acequia + erosion_suelo + desl
 	  P118_8 -> Otro 	*/
 
 drop if GESTION ==. // escuelas privadas
-drop GESTION
 
 replace clima=2 if clima ==1 // desértico y desertico costero
 codebook clima
@@ -305,7 +297,7 @@ label val clima tipoclima
 	gen servicios_cp=salud_cp+P201_7+P201_8+P201_9+P201_10+P201_11+P201_12
 
 isid CODLOCAL
-keep CODLOCAL GESTION clima topografia capital_ugel trayectos_cap servicios_basicos_cp servicios_cp peligro_nat peligro_antropicos vulnerabilidad area_m2 
+keep CODLOCAL clima topografia capital_ugel trayectos_cap servicios_basicos_cp servicios_cp peligro_nat peligro_antropicos vulnerabilidad area_m2 
 
 save "Local_lineal_limpia", replace
 
@@ -394,7 +386,7 @@ gen infe_estado=((piso_e)+(techo_e)+(pared_e))/3
 gen infe_material=(piso_mat+techo_mat+pared_mat)/3
 drop pared_estado techo_estado piso_estado pared_mat techo_mat piso_mat
 
-gen infra_indice= (infe_estado+infe_material)/2
+gen infra_indice= (0.6*infe_estado+0.4*infe_material)/2
  
 egen infraestructura_z = std(infra_indice)
 drop infe_material
@@ -411,9 +403,14 @@ $censo
 use "horario.dta", clear
 keep if inlist(NROCED, "1AP", "3AP", "3AS")
 keep if ANEXO=="0"
-gen horario_escolar = clock(HT_HORAS, HT_MINUTOS) - clock(HI_HORAS, HI_INICIO)
-keep COD_MOD horario_escolar
-$data 
+summ HI_HORAS HI_MINUTOS HT_HORAS HT_MINUTOS
+gen hrs=HT_HORAS-HI_HORAS
+summ hrs // horas promedio -> 5
+replace hrs= 13 if HT_HORAS==1 &hrs<0 // cambiar a formato 24 horas
+replace hrs= 14 if HT_HORAS==2 &hrs<0
+replace hrs= 18 if HT_HORAS==6 &hrs<0
+keep COD_MOD hrs
+duplicates drop COD_MOD, force
 save "horario_limpia.dta", replace
 
 ******************************************************************************
@@ -629,6 +626,7 @@ D27 Auxiliar de educación
 $censo
 use "Lineal_total", clear 
 merge 1:1 CODLOCAL COD_MOD using "Equipamiento_limpia", nogen
+merge 1:1 COD_MOD using "horario_limpia", nogen
 *merge 1:1 CODLOCAL COD_MOD using "recursos_acce_limpia", nogen
 merge 1:1 CODLOCAL COD_MOD using "Docentes_limpia", nogen
 merge m:1 CODLOCAL using "Local_lineal_limpia", nogen
@@ -640,14 +638,8 @@ merge m:1 CODLOCAL using "Local_Servicios_Basicos_limpia2", nogen
 
 duplicates drop
 drop if COD_MOD==""
-isid CODLOCAL COD_MOD
-
-gen servicios_ie=agua_ie+desague_ie+electricidad_ie+internet
-drop agua_ie desague_ie electricidad_ie internet
-
-
-egen aream2_z = std(area_m2)
-
+drop if CODLOCAL== ""
+isid COD_MOD
 *drop programa material_edu
 *drop salud_docente topografia clima capital_ugel trayectos_cap
 $data

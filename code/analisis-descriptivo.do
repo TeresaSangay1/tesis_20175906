@@ -1,5 +1,7 @@
 
 *ssc install asdoc
+*ssc install schemepack, replace
+set scheme white_jet // gg_viridis white_viridis
 
 global data cd "C:\Users\teresa\Documents\GIT\TESIS\data"
 global resources cd "C:\Users\teresa\Documents\GIT\TESIS\resources" 
@@ -9,30 +11,42 @@ use "data_final", clear
 
 * irp promedio según dpto macroregion y arae geográfica:
 
-foreach x in irp irp10 irp25{
+foreach x in irp irp10 irp21{
 table  dpto, c(mean `x')
 table macror, c(mean `x') 
-table area_g, c(mean `x')
+table area, c(mean `x')
 }
 
 mean irp
 
 tabstat irp, stat(mean cv) by(dpto)
-ttest irp, by(area_g)
+
+* irp promedio segun servicios básicos
+graph bar 	
+graph export "g6.png", width(1000) replace
+		
+		
+ttest irp, by(servicios_cp)
+ttest irp, by(servicios_ie)
+
+** irp segun caracteristicas de los docentes
+
+**
+servicios_basicos_cp servicios_ie
 
 * IRP PROMEDIO POR GRUPOS
 *Grafico 1
-grmeanby macror area_g region ruralidad frontera vraem, summarize(irp) ytitle("Media") title("Promedio de IRP por grupos") name(gd1, replace)
+grmeanby macror area region ruralidad frontera vraem, summarize(irp) ytitle("Media") name(gd1, replace) title("")
 $fig
-graph export "gd1.png", width(500) replace
+graph export "gd1.png", width(2000) replace
 *grafico 2
-grmeanby nivel est_ge_originario servicios_basicos_cp servicios_ie, summarize(irp) ytitle("Media") name(gd2a, replace)
+grmeanby nivel est_ge_originario eib est_lengua_orig, summarize(irp) ytitle("Media") name(gd2a, replace) title("")
 $fig
-graph export "gd2a.png", width(500) replace
+graph export "gd2a.png", width(2000) replace
 
-grmeanby eib comunidad_leng_orig est_lengua_orig , summarize(irp) ytitle("Media") name(gd2b, replace) title("")
+grmeanby   , summarize(irp) ytitle("Media") name(gd2b, replace) title("")
 $fig
-graph export "gd2b.png", width(500) replace
+graph export "gd2b.png", width(2000) replace
 
 
 * IRP promedio por dpto
@@ -40,10 +54,12 @@ local mean_irp=r(mean irp)
 display `mean_irp'
 graph hbar (mean) irp, over(dpto)  blabel(total, size(small) format(%2.1f)) ytitle("promedio")  yline(`mean_irp') name(gd3, replace)
 $fig
-graph export "gd3.png", width(500) replace
+graph export "gd3.png", width(1000) replace
 
 global vars " apoyo_docente salud_docente acompañamiento castellano_segunda_lengua enseñanza_bilingue"
 
+
+** 
 
 
 * codebook $vars
