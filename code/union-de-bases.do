@@ -67,12 +67,8 @@ gen rural = area ==2
 
 ** indice de rotacion parcial (asumiendo nuevas contratciones = 0 por limitacion de la data)
 gen irp = (plazas_vacantes*100)/(plazas_total)
-replace irp=0 if irp==. //escuelas sin salidas de docentes -> irp=0
-summ irp  // indice de rotción promedio = 24%
-
-gen vac_d=plazas_vacantes != 0 // dummy =1 si presenta almenos 1 plaza vacantes
-gen irp22=irp>=22 //=1 si presenta de 25% a más de irp
-summ irp irp22
+replace irp=0 if irp==. //escuelas sin plazas vacantes -> irp=0
+summ irp // indice de rotción promedio = 24%
 
 merge m:m cod_prov using "coord-cap-prov-limpia", nogen
 replace dpto = 15 if dpto ==7 //incluir Callao en lima
@@ -93,7 +89,7 @@ label def eib 1 "EIB" 0 "NO EIB"
 label val eib eib
 label var comunidad_leng "Mayoría de la comunidad habla lengua nativa"
  
-replace material="1" if material=="SI"
+replace material="1" if material=="SI" //recibio material eductivo
 replace material="0" if material=="NO"
 destring material, replace 
  
@@ -116,7 +112,7 @@ gen experiencia16_25=(experiencia_16/(experiencia_15_n+experiencia_16_25+experie
 gen experiencia26_40=(experiencia_26/(experiencia_15_n+experiencia_16_25+experiencia_26_40+experiencia_41_n))*100
 gen experiencia41=(experiencia_41/(experiencia_15_n+experiencia_16_25+experiencia_26_40+experiencia_41_n))*100
 
-foreach x in jorn_40 jorn_25 jorn_30 edad30 edad31_60 edad60 experiencia16_25 experiencia26_40 experiencia41 mujer_n hombre_n contratados_n nombrados_n{
+foreach x in jorn_40 jorn_25 jorn_30 edad30 edad31_60 edad60 experiencia16_25 experiencia26_40 experiencia41 contratados_n nombrados_n{
 replace `x'=0 if `x'==.
 }
 
@@ -130,11 +126,8 @@ drop X Y CODLOCAL longitud latitud cod_prov Rasgo jornada* edad_* experiencia_* 
 recode nuevos_doc (.=0)
 replace apoyo_docente = acompañamiento + apoyo // docente recibe apoyo y/o acompañamiento
 drop acompañamiento
-*ratio alumnos por docente
-gen ape= talumno/tdocente
-replace ape=0 if ape==.
 
-** tamaño de clase
+** Ratio alumnos por seccion (aproximado tamño de clase)
 gen tamclase=talumno/tseccion
 replace tamclase=0 if tamclase==.
 drop if tdocente==.
@@ -143,16 +136,40 @@ recode material (.=0)
 *drop salud
 
 gen servicios_ie=agua_ie+desague_ie+electricidad_ie+internet
-drop agua_ie desague_ie electricidad_ie internet
+*drop agua_ie desague_ie electricidad_ie internet
 egen aream2_z = std(area_m2)
 replace hrs=5 if hrs==. // asignar horas promedio a missing
 
-local varlist "eib est_ge_originario fortalecimiento_gestion total_equipo clima topografia capital_ugel trayectos_cap peligro_nat peligro_antropicos area_m2 infe_estado servicios_ie experiencia15"
+local varlist "eib est_ge_originario fortalecimiento_gestion total_equipo clima topografia capital_ugel trayectos_cap peligro_nat peligro_antropicos area_m2 servicios_ie experiencia15"
 foreach var of local varlist {
   drop if missing(`var')
 }
 
+*dummys
+gen inicial=nivel==1
+gen primaria=nivel==2
+gen secundaria=nivel==3
 
+gen unidocente=tipoie==3
+gen multigrado=inlist(tipoie, 2, 3)
+gen completo=tipoie==1
 
+gen macroreg_norte=macroregion==1
+gen macroreg_centro=macroregion==2
+gen macroreg_lima=macroregion==3
+gen macroreg_oriente=macroregion==4
+gen macroreg_sur=macroregion==5
+
+gen urbana=rural==0
+
+gen rural1=ruralidad==1
+gen rural2=ruralidad==2
+gen rural3=ruralidad==3
+
+gen costa=region_nat==1
+gen selva=region_nat==3
+gen sierra=region_nat==2
+
+gen d_est_ge=est_ge_originario==1
 $data
 save "data_final", replace

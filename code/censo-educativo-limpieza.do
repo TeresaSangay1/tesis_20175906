@@ -130,7 +130,6 @@ foreach var of local varlist5 {
 label var est_ge_originario "alumnos pertenecientes a un grupo étnico originario"
 label def est_ge_originario 0 "Ninguno" 1 "Algunos o pocos" 2 "Mayoría", modify
 label val est_ge_originario est_ge_originario
-tab est_ge_originario
 label var comunidad "Comunidad habla lengua originaria"
 
 destring experiencia_dir est_lengua, replace
@@ -138,7 +137,6 @@ label var est_lengua "Lengua originaria de los estudiantes"
 replace est_lengua = 0 if estlo == 0 & est_lengua==.
 label def est_lengua 0 "ninguno" 1 "Pocos" 2 "La mayoria" 3 "Todos"
 label val est_lengua est_lengua
-
 replace experiencia_dir_años = 12 if experiencia_dir_años==1212 //corrigir registros
 *drop if experiencia_dir_años > 90 // eliminar errores
 replace experiencia_dir_años =. if experiencia_dir_años > 90
@@ -297,7 +295,7 @@ label val clima tipoclima
 	gen servicios_cp=salud_cp+P201_7+P201_8+P201_9+P201_10+P201_11+P201_12
 
 isid CODLOCAL
-keep CODLOCAL clima topografia capital_ugel trayectos_cap servicios_basicos_cp servicios_cp peligro_nat peligro_antropicos vulnerabilidad area_m2 
+keep CODLOCAL clima topografia capital_ugel trayectos_cap servicios_basicos_cp servicios_cp agua_cp electricidad_cp desague_cp internet_cp peligro_nat peligro_antropicos vulnerabilidad area_m2 
 
 save "Local_lineal_limpia", replace
 
@@ -309,93 +307,65 @@ $censo
 use "Local_Sec500.dta", clear
 
 keep if inlist(P501_3_1, "A1", "A2", "A3", "B0", "F0") 
-keep CODLOCAL NUMERO P501_8_2 P501_8_3 P501_11_1 P501_11_2 P501_12_1 P501_12_2 P501_13_1 P501_13_2 
-rename (P501_8_2 P501_8_3 P501_11_1 P501_11_2 P501_12_1 P501_12_2 P501_13_1 P501_13_2) (puertas_estado puertas pared pared_estado techo techo_estado piso piso_estado)
+keep CODLOCAL NUMERO P501_11_1 P501_11_2 P501_12_1 P501_12_2 P501_13_1 P501_13_2 
+*rename (P501_11_1 P501_11_2 P501_12_1 P501_12_2 P501_13_1 P501_13_2) (pared pared_estado techo techo_estado piso piso_estado)
 duplicates drop
 
-tab pared
-gen pared_mat = 3 if inlist(pared,1,4)
-replace pared_mat = 2 if inlist(pared, 2,3,5,6,7,8,9)
-replace pared_mat = 1 if inlist(pared, 2,3,5,6,7,8,9)
-label var pared_mat "Pared - material predominante"
-label def material 3 "material noble" 2 "material rústico" 1 "material precario"
+gen pared = inlist(P501_11_1,1,4) //=1 pared es materia noble
+gen techo=inlist(P501_12_1, 2,3,4,5,6,7,9) 
+gen piso=inlist(P501_13_1,1,2,3,4)
+*gen pared_mat = 3 if inlist(pared,1,4)
+*replace pared_mat = 2 if inlist(pared, 2,3,5,6,7,8,9)
+*replace pared_mat = 1 if inlist(pared, 2,3,5,6,7,8,9)
+*label var pared_mat "Pared - material predominante"
+*label def material 3 "material noble" 2 "material rústico" 1 "material precario"
 /* noble : ladrillo o concreto 
 rústico: quincha, adobe o tapial, o piedra con barro, cal y/o cemento, madera
 precario: eternit o fibra de concreto, estera, triplay, cartón o plástico, otros */
-label val pared_mat material
-drop pared
-tab techo
-gen techo_mat = 3 if inlist(techo,1)
-replace techo_mat = 2 if inlist(techo, 2,3,4,5,6,7,9)
-replace techo_mat = 1 if inlist(techo,8,10)
-label var techo_mat "Techo - material predominante"
-label def techomat 1 "material precario" 2 "material no noble" 3 "material noble"
+*label val pared_mat material
+*drop pared
+
+*gen techo_mat = 3 if inlist(techo,1)
+*replace techo_mat = 2 if inlist(techo, 2,3,4,5,6,7,9)
+*replace techo_mat = 1 if inlist(techo,8,10)
+*label var techo_mat "Techo - material predominante"
+*label def techomat 1 "material precario" 2 "material no noble" 3 "material noble"
 /* noble: concreto armado
 no noble: madera, teja, calamina, fibra de cemento, o similares (eternit, lata o laton)
 precario: caña con barro, otro*/
-label val techo_mat techomat
-drop techo
-tab piso
-gen piso_mat = 1 if inlist(piso,6,7)
-replace piso_mat = 2 if inlist(piso,5)
-replace piso_mat = 3 if inlist(piso,1,2,3,4)
-label var piso_mat "Piso - material predominante"
-label def pisomat 1 "piso de tierra u otro" 2 "piso entablado" 3 "piso de cemento / Material adecuado" 
+*label val techo_mat techomat
+*drop techo
+
+*gen piso_mat = 1 if inlist(piso,6,7)
+*replace piso_mat = 2 if inlist(piso,5)
+*replace piso_mat = 3 if inlist(piso,1,2,3,4)
+*label var piso_mat "Piso - material predominante"
+*label def pisomat 1 "piso de tierra u otro" 2 "piso entablado" 3 "piso de cemento / Material adecuado" 
 /* material adecuado: parquet o madera pulida, vinilico, pisopk, loseta, ceramico o similar
 piso entablado: madera entablada
 piso de cemento: cemento
 piso de tierra u otro : tierra, otro
 */
-label val piso_mat pisomat
-drop piso 
+*label val piso_mat pisomat
+*drop piso 
 
-drop puertas*
-/*tab puertas
-gen puerta_mat = 0 if inlist(puertas,)
-replace puerta_mat = 1 if inlist(puertas,)
-replace puerta_mat = 2 if inlist(puertas,)
-replace puerta_mat = 3 if inlist(puertas,)
-label var puerta_mat "Puerta - material predominante"
-label def puertamat 0 " 
-/* material adecuado: 
-	*/
-label val puerta_mat puertamat
-drop puertas*/
-
-*tab puertas_
-tab pared_estado
-tab techo_estado
-tab piso_estado
-
-recode piso_e techo_e pared_e (1 5=4)(2=3)(3=2)(4=1)
-label def estado 1 "No tiene y lo requiere" 2 "Malo" 3 "Regular" 4 "bueno", modify
-label val piso_e techo_e pared_e estado
+*recode piso_e techo_e pared_e (1 5=4)(2=3)(3=2)(4=1)
+*label def estado 1 "No tiene y lo requiere" 2 "Malo" 3 "Regular" 4 "bueno", modify
+*label val piso_e techo_e pared_e estado
 *order CODLOCAL NUMERO puertas* pared* piso* techo*
 
-local varlist2 "pared_estado techo_estado piso_estado pared_mat techo_mat piso_mat"
-foreach var of local varlist2 {
-	bysort CODLOCAL: egen vr= mean(`var') 
-	replace `var' = vr
-	drop vr 
-	}
+foreach x in piso techo pared {
+bysort CODLOCAL: egen var=mean(`x')
+replace `x'=round(var)
+drop var
+}
 
-	drop NUMERO
-	duplicates drop
-
-gen infe_estado=((piso_e)+(techo_e)+(pared_e))/3
-gen infe_material=(piso_mat+techo_mat+pared_mat)/3
-drop pared_estado techo_estado piso_estado pared_mat techo_mat piso_mat
-
-gen infra_indice= (0.6*infe_estado+0.4*infe_material)/2
- 
-egen infraestructura_z = std(infra_indice)
-drop infe_material
-
+drop NUMERO
+keep piso techo pared CODLOCAL
 duplicates drop
 	
 isid CODLOCAL
 
-count // 48,706
 save "Local_sec500_limpia", replace
 
 ***************************************************************************

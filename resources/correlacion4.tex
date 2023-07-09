@@ -1,0 +1,20 @@
+{
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\begin{tabular}{l*{8}{c}}
+\hline\hline
+          &\multicolumn{8}{c}{(1)}                                                                                                                                \\
+          &\multicolumn{8}{c}{}                                                                                                                                   \\
+          &      irp         &servicios\_basicos\_cp         &servicios\_cp         &macroregion         &ruralidad         &    vraem         & frontera         &  altitud         \\
+\hline
+irp       &        1         &                  &                  &                  &                  &                  &                  &                  \\
+servicios\_basicos\_cp&   -0.213\sym{***}&        1         &                  &                  &                  &                  &                  &                  \\
+servicios\_cp&   -0.142\sym{***}&    0.617\sym{***}&        1         &                  &                  &                  &                  &                  \\
+macroregion&   0.0860\sym{***}&  -0.0262\sym{***}& -0.00463         &        1         &                  &                  &                  &                  \\
+ruralidad &  0.00875         &   -0.306\sym{***}&   -0.512\sym{***}& -0.00624         &        1         &                  &                  &                  \\
+vraem     &   0.0981\sym{***}&  -0.0539\sym{***}&  -0.0709\sym{***}&    0.236\sym{***}& -0.00247         &        1         &                  &                  \\
+frontera  &   0.0503\sym{***}&   -0.144\sym{***}&  -0.0527\sym{***}&   -0.117\sym{***}&   0.0428\sym{***}&  -0.0574\sym{***}&        1         &                  \\
+altitud   &  0.00143         &  -0.0633\sym{***}&   -0.235\sym{***}&   0.0356\sym{***}&    0.297\sym{***}&  0.00733         &  0.00236         &        1         \\
+\hline\hline
+\multicolumn{9}{l}{\footnotesize \sym{*} \(p<0.05\), \sym{**} \(p<0.01\), \sym{***} \(p<0.001\)}\\
+\end{tabular}
+}

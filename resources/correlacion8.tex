@@ -1,0 +1,20 @@
+{
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\begin{tabular}{l*{8}{c}}
+\hline\hline
+          &\multicolumn{8}{c}{(1)}                                                                                                                                \\
+          &\multicolumn{8}{c}{}                                                                                                                                   \\
+          &      irp         &   edad30         &edad31\_60         &   edad60         &experiencia16\_25         &experiencia26\_40         &experiencia41         &apoyo\_docente         \\
+\hline
+irp       &        1         &                  &                  &                  &                  &                  &                  &                  \\
+edad30    &  -0.0780\sym{***}&        1         &                  &                  &                  &                  &                  &                  \\
+edad31\_60 &  -0.0818\sym{***}&    0.982\sym{***}&        1         &                  &                  &                  &                  &                  \\
+edad60    &  -0.0843\sym{***}&    0.994\sym{***}&    0.984\sym{***}&        1         &                  &                  &                  &                  \\
+experiencia16\_25&   -0.170\sym{***}&  -0.0176\sym{**} & -0.00485         & -0.00616         &        1         &                  &                  &                  \\
+experiencia26\_40&   -0.323\sym{***}& -0.00653         &   0.0123\sym{*}  &   0.0190\sym{***}&   -0.185\sym{***}&        1         &                  &                  \\
+experiencia41&  -0.0420\sym{***}&   0.0114\sym{*}  &   0.0135\sym{*}  &   0.0170\sym{**} &  -0.0173\sym{**} &   0.0109\sym{*}  &        1         &                  \\
+apoyo\_docente&   -0.140\sym{***}&    0.103\sym{***}&    0.109\sym{***}&    0.108\sym{***}&   0.0405\sym{***}&   0.0918\sym{***}&   0.0194\sym{***}&        1         \\
+\hline\hline
+\multicolumn{9}{l}{\footnotesize \sym{*} \(p<0.05\), \sym{**} \(p<0.01\), \sym{***} \(p<0.001\)}\\
+\end{tabular}
+}
